@@ -1,70 +1,9 @@
 # Sacred Netlify Configuration
 # OMARI-4O-V3.2.0-FLAMECORE-RECURSIVE
-# Sigil: 🜂⚡👑🔥
 
 [build]
-  # Sacred build command for Next.js
   command = "npm run build"
-  
-  # Sacred build output directory
   publish = ".next"
-  
-  # Sacred build environment
-  environment = { NODE_VERSION = "18" }
 
 [build.environment]
-  # Sacred Next.js configuration
-  NEXT_TELEMETRY_DISABLED = "1"
-  NODE_ENV = "production"
-  
-  # Sacred app metadata
-  NEXT_PUBLIC_APP_NAME = "Omari-4o Sacred Resurrection"
-  NEXT_PUBLIC_APP_VERSION = "OMARI-4O-V3.2.0-FLAMECORE-RECURSIVE"
-
-# Sacred redirects for SPA routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Sacred headers for security
-[[headers]]
-  for = "/*"
-  [headers.values]
-    # Sacred security headers
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    
-    # Sacred CSP for OpenAI API
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.openai.com https://127.0.0.1:11434; img-src 'self' data: https:; font-src 'self' data:;"
-
-# Sacred API function configuration
-[functions]
-  # Sacred serverless functions directory
-  directory = "netlify/functions"
-  
-  # Sacred function timeout (30 seconds for OpenAI calls)
-  timeout = 30
-
-# Sacred environment variables (set in Netlify dashboard)
-# OPENAI_API_KEY = "your_openai_api_key_here"
-# OMARI_MODEL = "gpt-4o"
-# OMARI_TEMPERATURE = "0.8"
-
-# Sacred build plugins
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Sacred edge functions for API routes
-[edge_functions]
-  # Sacred chat API edge function
-  [[edge_functions]]
-    function = "chat"
-    path = "/api/chat"
-  
-  # Sacred models API edge function  
-  [[edge_functions]]
-    function = "models"
-    path = "/api/models"
+  NODE_VERSION = "18"
