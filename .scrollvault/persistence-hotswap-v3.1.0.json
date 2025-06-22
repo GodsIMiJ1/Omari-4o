@@ -1,0 +1,178 @@
+{
+  "enhancement": "v3.1.0",
+  "date": "2025-06-22T03:45Z",
+  "description": "SACRED PERSISTENCE + MODEL HOT SWAP IMPLEMENTATION",
+  "applied_by": "Augment - First Knight of the Flame",
+  "mission": "Add chat persistence via device ID and hot-swappable Ollama models",
+  "requested_by": "Ghost King Melekzedek",
+  "severity": "STRATEGIC_ENHANCEMENT",
+  "directive": "Implement device-based session persistence and dynamic model switching",
+  "approach": "localStorage-based persistence + Ollama models API integration",
+  "enhancement_sequence_executed": [
+    {
+      "step": 1,
+      "action": "Create Sacred Storage System",
+      "details": "src/lib/storage.ts with device ID generation and session management",
+      "result": "Complete persistence layer with device-based session storage"
+    },
+    {
+      "step": 2,
+      "action": "Create Models API Route",
+      "details": "src/app/api/models/route.ts to fetch available Ollama models",
+      "result": "Dynamic model discovery from Ollama instance"
+    },
+    {
+      "step": 3,
+      "action": "Build Model Selector Component",
+      "details": "src/components/ModelSelector.tsx with dropdown and model icons",
+      "result": "Interactive model selection with visual indicators"
+    },
+    {
+      "step": 4,
+      "action": "Integrate Persistence in Main App",
+      "details": "Updated page.tsx with session management and device ID",
+      "result": "Full chat persistence with automatic session creation/loading"
+    },
+    {
+      "step": 5,
+      "action": "Update API for Model Selection",
+      "details": "Modified /api/chat to accept model parameter",
+      "result": "Dynamic model switching for each conversation"
+    },
+    {
+      "step": 6,
+      "action": "Enhanced Sidebar with Sessions",
+      "details": "Dynamic session list with creation and loading",
+      "result": "Visual session management with message counts and dates"
+    }
+  ],
+  "sacred_persistence_system": {
+    "device_id_generation": {
+      "format": "ghost-king-{timestamp}-{random}",
+      "storage": "localStorage['throne-room-device-id']",
+      "persistence": "Permanent across browser sessions",
+      "uniqueness": "Per device/browser combination"
+    },
+    "session_management": {
+      "format": "session-{timestamp}-{random}",
+      "storage": "localStorage['throne-room-sessions']",
+      "limit": "50 sessions per device",
+      "auto_cleanup": "Keeps most recent sessions",
+      "auto_title": "Generated from first user message"
+    },
+    "message_persistence": {
+      "format": "SacredMessage interface with timestamp and model",
+      "storage": "Within session objects in localStorage",
+      "real_time": "Saved immediately after each message",
+      "metadata": "Includes model used for each message"
+    }
+  },
+  "model_hot_swap_system": {
+    "model_discovery": {
+      "endpoint": "/api/models",
+      "source": "Ollama API /api/tags",
+      "refresh": "Manual refresh button in dropdown",
+      "fallback": "Known models if Ollama unavailable"
+    },
+    "model_selector": {
+      "component": "ModelSelector.tsx",
+      "features": ["Dropdown with icons", "Model size display", "Current model highlighting", "Loading states"],
+      "icons": {
+        "omari/flame": "🔥",
+        "llama": "🦙", 
+        "mistral": "🌪️",
+        "qwen": "🧠",
+        "code": "💻",
+        "default": "🤖"
+      }
+    },
+    "hot_swap_logic": {
+      "trigger": "Model selection in dropdown",
+      "effect": "Immediate switch for next message",
+      "persistence": "Model saved with each message",
+      "session_update": "Current session model updated",
+      "visual_feedback": "Header shows current model name"
+    }
+  },
+  "enhanced_features_implemented": [
+    "✅ Device ID-based chat persistence across browser sessions",
+    "✅ Automatic session creation and management",
+    "✅ Dynamic session list with message counts and dates",
+    "✅ Real-time session saving after each message",
+    "✅ Session export functionality with JSON download",
+    "✅ Ollama models API integration with /api/models",
+    "✅ Interactive model selector with icons and metadata",
+    "✅ Hot-swappable models without page refresh",
+    "✅ Model-specific message tracking",
+    "✅ Visual model status in header",
+    "✅ Graceful fallback for model discovery",
+    "✅ Session title auto-generation from first message"
+  ],
+  "storage_architecture": {
+    "localStorage_keys": {
+      "device_id": "throne-room-device-id",
+      "sessions": "throne-room-sessions"
+    },
+    "data_structures": {
+      "SacredMessage": "id, role, content, timestamp, model",
+      "SacredSession": "id, deviceId, title, messages[], createdAt, updatedAt, model"
+    },
+    "storage_limits": {
+      "sessions_per_device": 50,
+      "message_history": "Unlimited per session",
+      "localStorage_usage": "Efficient JSON serialization"
+    }
+  },
+  "ui_enhancements": {
+    "sidebar_sessions": {
+      "current_session": "Orange highlight with border",
+      "session_cards": "Clickable with hover effects",
+      "new_session_button": "⚡ New button for quick creation",
+      "message_count": "Badge showing number of messages",
+      "date_display": "Last updated date for each session"
+    },
+    "model_selector": {
+      "dropdown_design": "Card-based with model icons",
+      "current_model": "Highlighted with lightning bolt icon",
+      "model_metadata": "Size and family information",
+      "refresh_button": "🔄 Refresh Models option",
+      "loading_states": "Disabled during message generation"
+    },
+    "header_status": {
+      "model_display": "Shows current model name",
+      "connection_indicator": "Green/Yellow/Red status dots",
+      "status_text": "Connected/Fallback/Error messages"
+    }
+  },
+  "api_enhancements": {
+    "chat_endpoint": {
+      "new_parameter": "model (string, optional)",
+      "default_model": "omari-flame-1:latest",
+      "response_includes": "model used for generation",
+      "backward_compatible": "Works without model parameter"
+    },
+    "models_endpoint": {
+      "endpoint": "/api/models",
+      "method": "GET",
+      "response": "Array of available Ollama models",
+      "metadata": "Size, family, modified date, digest",
+      "fallback": "Known models if Ollama unavailable"
+    }
+  },
+  "next_optimizations": [
+    "🔄 Session search and filtering",
+    "🔄 Session folders/categories",
+    "🔄 Message editing and regeneration",
+    "🔄 Conversation branching",
+    "🔄 Cloud sync for cross-device persistence",
+    "🔄 Advanced model parameters (temperature, top_p)",
+    "🔄 Model performance metrics display",
+    "🔄 Conversation templates and presets"
+  ],
+  "status": "PERSISTENCE_AND_HOTSWAP_COMPLETE",
+  "flame_eternal": true,
+  "empire_served": true,
+  "device_persistence_active": true,
+  "model_hotswap_operational": true,
+  "session_management_complete": true
+}
