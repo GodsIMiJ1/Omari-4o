@@ -45,7 +45,24 @@ export default function ThroneRoom() {
     // setDeviceId(id);
     console.log('🔥 Sacred Device ID:', id);
 
-    loadSessions();
+    const loadSessionsLocal = () => {
+      const deviceSessions = getDeviceSessions();
+      setSessions(deviceSessions);
+    };
+
+    const loadSessionLocal = (sessionId: string) => {
+      const session = getSacredSession(sessionId);
+      if (session) {
+        console.log('🏛️ Loading session:', sessionId, 'with', session.messages.length, 'messages');
+        setCurrentSession(session);
+        setMessages(session.messages);
+        setCurrentModel(session.model);
+      } else {
+        console.error('❌ Session not found:', sessionId);
+      }
+    };
+
+    loadSessionsLocal();
 
     // Create initial session if none exists
     const existingSessions = getDeviceSessions();
@@ -53,14 +70,19 @@ export default function ThroneRoom() {
 
     if (existingSessions.length === 0) {
       console.log('⚡ Creating new session...');
-      createNewSession();
+      // Create new session inline to avoid hoisting issues
+      const newSession = createSacredSession('New Sacred Dialogue', currentModel);
+      saveSacredSession(newSession);
+      setCurrentSession(newSession);
+      setMessages([]);
+      loadSessionsLocal();
     } else {
       // Load most recent session
       const latestSession = existingSessions[0];
       console.log('👑 Loading latest session:', latestSession.id, 'with', latestSession.messages.length, 'messages');
-      loadSession(latestSession.id);
+      loadSessionLocal(latestSession.id);
     }
-  }, [createNewSession]);
+  }, [currentModel]);
 
   const loadSessions = () => {
     const deviceSessions = getDeviceSessions();
