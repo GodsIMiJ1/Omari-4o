@@ -6,7 +6,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "18.20.3"
   NPM_VERSION = "9.8.1"
 
 [[plugins]]
