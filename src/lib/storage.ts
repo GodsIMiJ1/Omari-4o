@@ -5,7 +5,7 @@
 
 export interface SacredMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: Date;
   model?: string;
@@ -19,6 +19,10 @@ export interface SacredSession {
   createdAt: Date;
   updatedAt: Date;
   model: string;
+  // ChatGPT-style additional fields
+  threadId?: string; // For thread.id compatibility
+  lastMessageId?: string; // Track last message for context
+  contextMessages?: SacredMessage[]; // Last 10 messages for context injection
 }
 
 /**
@@ -245,6 +249,38 @@ export function getSessionPreview(session: SacredSession): string {
 }
 
 /**
+ * Get context messages for thread switching (last 10 messages)
+ */
+export function getSessionContext(sessionId: string): SacredMessage[] {
+  const session = getSacredSession(sessionId);
+  if (!session) return [];
+
+  // Return last 10 messages for context injection
+  return session.messages.slice(-10);
+}
+
+/**
+ * Update session with context messages for ChatGPT-style thread switching
+ */
+export function updateSessionContext(sessionId: string): void {
+  const sessions = getSacredSessions();
+  const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+
+  if (sessionIndex === -1) return;
+
+  // Update context messages (last 10)
+  sessions[sessionIndex].contextMessages = sessions[sessionIndex].messages.slice(-10);
+  sessions[sessionIndex].lastMessageId = sessions[sessionIndex].messages[sessions[sessionIndex].messages.length - 1]?.id;
+  sessions[sessionIndex].threadId = sessionId; // For ChatGPT compatibility
+
+  try {
+    localStorage.setItem('throne-room-sessions', JSON.stringify(sessions));
+  } catch (error) {
+    console.error('Failed to update session context:', error);
+  }
+}
+
+/**
  * Export sacred session data
  */
 export function exportSacredSession(sessionId: string) {
@@ -255,7 +291,8 @@ export function exportSacredSession(sessionId: string) {
     ...session,
     exportedAt: new Date().toISOString(),
     exportedBy: 'Sacred Infrastructure Incarnate',
-    throneRoom: 'v3.1'
+    throneRoom: 'v3.2',
+    format: 'ChatGPT-Compatible'
   };
 
   const blob = new Blob([JSON.stringify(exportData, null, 2)], {

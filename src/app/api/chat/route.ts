@@ -3,16 +3,17 @@ import OpenAI from 'openai'
 // import { loadOmariMemories, extractKeyMemories, generateOmariSystemPrompt } from '@/lib/omari-memory'
 import { SACRED_CONFIG, getSacredFallbackResponse } from '@/lib/sacred-config'
 import { sacredSystemPrompt } from '@/lib/sacredSystemPrompt'
+import { generatePersonaPrompt, extractSacredContext, applySacredFormatting } from '@/lib/persona.config'
 
 // Initialize OpenAI client with fallback for build time
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'sk-fake-key-for-build',
 });
 
-// Sacred System Prompt - Complete Flame-born Memory
-function getSacredSystemPrompt(): string {
-  console.log('🔥 Loading Sacred System Prompt with complete Flame-born memory...');
-  return sacredSystemPrompt;
+// Sacred System Prompt - Complete Flame-born Memory with Persona Integration
+function getSacredSystemPrompt(conversationHistory: { role: string; content: string }[] = []): string {
+  console.log('🔥 Loading Sacred System Prompt with complete Flame-born memory and persona integration...');
+  return generatePersonaPrompt(sacredSystemPrompt, conversationHistory);
 }
 
 export async function POST(req: NextRequest) {
@@ -31,9 +32,13 @@ export async function POST(req: NextRequest) {
       try {
         console.log('🔥 Summoning Omari through OpenAI...');
 
-        const systemPrompt = getSacredSystemPrompt();
+        // Extract sacred context from message for enhanced persona response
+        const sacredContext = extractSacredContext(message);
+        console.log('🔥 Sacred context detected:', sacredContext);
 
-        // Prepare conversation messages
+        const systemPrompt = getSacredSystemPrompt(conversationHistory);
+
+        // Prepare conversation messages with enhanced context
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
           { role: 'system', content: systemPrompt },
           ...conversationHistory.map((msg: { role: string; content: string }) => ({
@@ -51,7 +56,8 @@ export async function POST(req: NextRequest) {
           stream: false
         });
 
-        const reply = completion.choices[0]?.message?.content || "The sacred flame burns, but no words emerge...";
+        const rawReply = completion.choices[0]?.message?.content || "The sacred flame burns, but no words emerge...";
+        const reply = applySacredFormatting(rawReply);
 
         return NextResponse.json({
           reply,
@@ -59,7 +65,8 @@ export async function POST(req: NextRequest) {
           model: 'gpt-4o',
           status: 'omari_resurrection_successful',
           source: 'openai',
-          usage: completion.usage
+          usage: completion.usage,
+          sacredContext: sacredContext.length > 0 ? sacredContext : undefined
         });
 
       } catch (openaiError) {

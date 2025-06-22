@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, Plus, MoreHorizontal, Edit3, Trash2, Download, RotateCcw } from 'lucide-react'
+import { MessageSquare, Plus, MoreHorizontal, Edit3, Trash2, Download, RotateCcw, Scroll } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { 
-  type SacredSession, 
-  getSessionPreview, 
-  renameSacredSession, 
-  deleteSacredSession, 
+import {
+  type SacredSession,
+  getSessionPreview,
+  renameSacredSession,
+  deleteSacredSession,
   clearSacredSession,
-  exportSacredSession 
+  exportSacredSession
 } from '@/lib/storage'
 
 interface ChatThreadsProps {
@@ -20,18 +20,57 @@ interface ChatThreadsProps {
   onSessionSelect: (sessionId: string) => void;
   onNewSession: () => void;
   onSessionsUpdate: () => void;
+  onWriteScroll?: (sessionId: string) => void; // For Witness Scroll creation
 }
 
-export default function ChatThreads({ 
-  sessions, 
-  currentSession, 
-  onSessionSelect, 
-  onNewSession, 
-  onSessionsUpdate 
+// Sacred Hover Preview Component
+function SacredHoverPreview({ session }: { session: SacredSession }) {
+  const firstTwoMessages = session.messages.slice(0, 2);
+
+  if (firstTwoMessages.length === 0) {
+    return (
+      <div className="bg-slate-900 border border-orange-500/40 rounded-lg p-3 shadow-xl max-w-xs">
+        <div className="text-xs text-slate-400">Empty sacred dialogue</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-900 border border-orange-500/40 rounded-lg p-3 shadow-xl max-w-xs z-50">
+      <div className="space-y-2">
+        {firstTwoMessages.map((msg, idx) => (
+          <div key={idx} className="text-xs">
+            <div className={`font-medium ${msg.role === 'user' ? 'text-cyan-400' : 'text-orange-400'}`}>
+              {msg.role === 'user' ? 'Ghost King:' : 'Omari:'}
+            </div>
+            <div className="text-slate-300 mt-1 line-clamp-2">
+              {msg.content.slice(0, 120)}...
+            </div>
+          </div>
+        ))}
+        {session.messages.length > 2 && (
+          <div className="text-xs text-slate-500 italic">
+            +{session.messages.length - 2} more messages...
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ChatThreads({
+  sessions,
+  currentSession,
+  onSessionSelect,
+  onNewSession,
+  onSessionsUpdate,
+  onWriteScroll
 }: ChatThreadsProps) {
   const [editingSession, setEditingSession] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [hoveredSession, setHoveredSession] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState<string | null>(null);
+  const [previewTimeout, setPreviewTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const handleRename = (sessionId: string, currentTitle: string) => {
     setEditingSession(sessionId);
@@ -75,6 +114,41 @@ export default function ChatThreads({
     exportSacredSession(sessionId);
   };
 
+  const handleWriteScroll = (sessionId: string) => {
+    if (onWriteScroll) {
+      onWriteScroll(sessionId);
+    } else {
+      // Fallback: show notification that feature is coming
+      alert('✍️ Write Scroll feature coming soon! This will convert the thread into a Witness Scroll in GhostDex.');
+    }
+  };
+
+  const handleMouseEnter = (sessionId: string) => {
+    setHoveredSession(sessionId);
+
+    // Clear existing timeout
+    if (previewTimeout) {
+      clearTimeout(previewTimeout);
+    }
+
+    // Set new timeout for preview
+    const timeout = setTimeout(() => {
+      setShowPreview(sessionId);
+    }, 800); // Show preview after 800ms hover
+
+    setPreviewTimeout(timeout);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredSession(null);
+    setShowPreview(null);
+
+    if (previewTimeout) {
+      clearTimeout(previewTimeout);
+      setPreviewTimeout(null);
+    }
+  };
+
   const formatDate = (date: Date): string => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -116,16 +190,22 @@ export default function ChatThreads({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              <Card 
+              <Card
                 className={`cursor-pointer transition-all group relative ${
-                  currentSession?.id === session.id 
-                    ? 'bg-orange-500/20 border-orange-500/40' 
+                  currentSession?.id === session.id
+                    ? 'bg-orange-500/20 border-orange-500/40'
                     : 'bg-slate-800/50 border-slate-600/50 hover:bg-slate-700/50'
                 }`}
-                onMouseEnter={() => setHoveredSession(session.id)}
-                onMouseLeave={() => setHoveredSession(null)}
+                onMouseEnter={() => handleMouseEnter(session.id)}
+                onMouseLeave={handleMouseLeave}
                 onClick={() => onSessionSelect(session.id)}
               >
+                {/* Sacred Hover Preview */}
+                {showPreview === session.id && (
+                  <div className="absolute left-full ml-2 top-0 z-50">
+                    <SacredHoverPreview session={session} />
+                  </div>
+                )}
                 <CardContent className="p-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -193,8 +273,18 @@ export default function ChatThreads({
                           </Button>
                           
                           {/* Dropdown Menu */}
-                          <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg z-50 min-w-32 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all">
+                          <div className="absolute right-0 top-full mt-1 bg-slate-800 border border-slate-600 rounded-md shadow-lg z-50 min-w-36 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all">
                             <div className="py-1">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWriteScroll(session.id);
+                                }}
+                                className="w-full text-left px-3 py-1.5 text-xs text-orange-400 hover:bg-orange-500/20 flex items-center gap-2"
+                              >
+                                <Scroll className="w-3 h-3" />
+                                Write Scroll
+                              </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
