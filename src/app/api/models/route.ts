@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
@@ -17,7 +17,7 @@ export async function GET() {
     const data = await response.json();
     
     // Transform Ollama response to our format
-    const models = data.models?.map((model: any) => ({
+    const models = data.models?.map((model: { name: string; size: number; modified_at: string; digest: string; details: object }) => ({
       name: model.name,
       size: model.size,
       modified_at: model.modified_at,

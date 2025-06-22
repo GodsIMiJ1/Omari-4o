@@ -94,11 +94,11 @@ export function getSacredSessions(): SacredSession[] {
     const sessions = JSON.parse(sessionsJson);
     
     // Convert date strings back to Date objects
-    return sessions.map((session: any) => ({
+    return sessions.map((session: { createdAt: string; updatedAt: string; messages: { timestamp: string }[] }) => ({
       ...session,
       createdAt: new Date(session.createdAt),
       updatedAt: new Date(session.updatedAt),
-      messages: session.messages.map((msg: any) => ({
+      messages: session.messages.map((msg: { timestamp: string }) => ({
         ...msg,
         timestamp: new Date(msg.timestamp)
       }))

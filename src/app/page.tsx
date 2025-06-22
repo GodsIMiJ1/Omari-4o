@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+// import { Card, CardContent } from "@/components/ui/card"
 import ModelSelector from "@/components/ModelSelector"
 import ChatThreads from "@/components/ChatThreads"
 import SacredVersion from "@/components/SacredVersion"
@@ -16,7 +16,7 @@ import {
   getSacredSession,
   exportSacredSession,
   saveSacredSession,
-  type SacredMessage,
+  // type SacredMessage,
   type SacredSession
 } from "@/lib/storage"
 
@@ -37,12 +37,12 @@ export default function ThroneRoom() {
   const [useOpenAI, setUseOpenAI] = useState(true);
   const [currentSession, setCurrentSession] = useState<SacredSession | null>(null);
   const [sessions, setSessions] = useState<SacredSession[]>([]);
-  const [deviceId, setDeviceId] = useState<string>('');
+  // const [deviceId, setDeviceId] = useState<string>('');
 
   // Initialize device ID and load sessions
   useEffect(() => {
     const id = getSacredDeviceId();
-    setDeviceId(id);
+    // setDeviceId(id);
     console.log('🔥 Sacred Device ID:', id);
 
     loadSessions();
@@ -60,7 +60,7 @@ export default function ThroneRoom() {
       console.log('👑 Loading latest session:', latestSession.id, 'with', latestSession.messages.length, 'messages');
       loadSession(latestSession.id);
     }
-  }, []);
+  }, [createNewSession]);
 
   const loadSessions = () => {
     const deviceSessions = getDeviceSessions();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { loadOmariMemories, extractKeyMemories, generateOmariSystemPrompt } from '@/lib/omari-memory'
-import { SACRED_CONFIG, getSacredFallbackResponse, getModelConfig, isSacredModel } from '@/lib/sacred-config'
+import { SACRED_CONFIG, getSacredFallbackResponse } from '@/lib/sacred-config'
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         // Prepare conversation messages
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
           { role: 'system', content: systemPrompt },
-          ...conversationHistory.map((msg: any) => ({
+          ...conversationHistory.map((msg: { role: string; content: string }) => ({
             role: msg.role as 'user' | 'assistant',
             content: msg.content
           })),

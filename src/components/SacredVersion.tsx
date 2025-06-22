@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Info, Crown, Flame, Zap } from 'lucide-react'
+import { Info, Flame } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getSacredMetadata } from '@/lib/sacred-config'

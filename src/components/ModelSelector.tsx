@@ -111,8 +111,8 @@ export default function ModelSelector({
     return 'Unknown model';
   };
 
-  const currentModelData = models.find(m => m.name === currentModel);
-  const isCurrentModelOpenAI = openAIModels.some(m => m.name === currentModel);
+  // const currentModelData = models.find(m => m.name === currentModel);
+  // const isCurrentModelOpenAI = openAIModels.some(m => m.name === currentModel);
 
   return (
     <div className="relative">
