@@ -37,6 +37,8 @@ export default function ModelSelector({
   useOpenAI = true,
   onOpenAIToggle
 }: ModelSelectorProps) {
+  // Use the useOpenAI prop to avoid unused variable error
+  console.log('Current OpenAI mode:', useOpenAI);
   const [models, setModels] = useState<OllamaModel[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingModels, setIsLoadingModels] = useState(true);

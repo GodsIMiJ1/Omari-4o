@@ -3,9 +3,9 @@ import OpenAI from 'openai'
 import { loadOmariMemories, extractKeyMemories, generateOmariSystemPrompt } from '@/lib/omari-memory'
 import { SACRED_CONFIG, getSacredFallbackResponse } from '@/lib/sacred-config'
 
-// Initialize OpenAI client
+// Initialize OpenAI client with fallback for build time
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-fake-key-for-build',
 });
 
 // Cache for Omari's memories (loaded once per server restart)
